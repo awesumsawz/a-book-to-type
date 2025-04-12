@@ -142,13 +142,13 @@ export default function TypingInterface({ text }: TypingInterfaceProps) {
   };
   
   return (
-    <div className="border rounded-lg overflow-hidden shadow-sm">
+    <div className="border rounded-lg overflow-hidden shadow-lg bg-[#0f1b31]">
       {/* Controls Bar */}
-      <div className="flex items-center justify-between bg-gray-50 border-b p-4">
+      <div className="flex items-center justify-between bg-[#1a2b4b] border-b border-[#2a3b5b] p-4 text-white shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={toggleActive}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-black text-white hover:bg-gray-800 transition-colors"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1a2b4b] text-white hover:bg-[#2a3b5b] transition-colors"
             aria-label={isActive ? "Pause" : "Play"}
           >
             {isActive ? <PauseIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
@@ -156,7 +156,7 @@ export default function TypingInterface({ text }: TypingInterfaceProps) {
           
           <button
             onClick={handleRestart}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1a2b4b] text-white hover:bg-[#2a3b5b] transition-colors"
             aria-label="Restart"
           >
             <ArrowPathIcon className="w-5 h-5" />
@@ -194,7 +194,7 @@ export default function TypingInterface({ text }: TypingInterfaceProps) {
       {/* Typing Area */}
       <div className="relative" onClick={focusInput}>
         {showMetrics && completedCharacters > 0 && (
-          <div className="absolute inset-0 bg-white z-10 p-6 overflow-auto">
+          <div className="absolute inset-0 bg-[#0f1b31] text-white z-10 p-6 overflow-auto shadow-inner">
             <TypingMetrics 
               wpm={wpm()}
               accuracy={accuracy()}
@@ -206,7 +206,7 @@ export default function TypingInterface({ text }: TypingInterfaceProps) {
             <div className="flex justify-center mt-8">
               <button
                 onClick={handleRestart}
-                className="py-2 px-6 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                className="py-2 px-6 bg-[#1a2b4b] text-white rounded-md hover:bg-[#2a3b5b] transition-colors shadow-sm"
               >
                 Practice Again
               </button>
@@ -216,16 +216,16 @@ export default function TypingInterface({ text }: TypingInterfaceProps) {
         
         <div 
           ref={wrapperRef}
-          className="p-6 max-h-96 overflow-y-auto bg-white relative"
+          className="p-6 max-h-96 overflow-y-auto bg-[#0f1b31] text-white relative shadow-inner"
         >
           <div className="text-lg leading-relaxed font-mono whitespace-pre-wrap">
             {characters.map((char, index) => {
-              let status = 'text-gray-300'; // Default: not typed yet
+              let status = 'text-gray-400'; // Default: not typed yet
               
               if (index < input.length) {
-                status = input[index] === char ? 'text-black' : 'text-red-500 bg-red-50'; // Correct or Error
+                status = input[index] === char ? 'text-white' : 'text-red-400 bg-red-900'; // Correct or Error
               } else if (index === input.length) {
-                status = 'text-gray-800 bg-gray-200'; // Current position
+                status = 'text-white bg-[#2a3b5b]'; // Current position
               }
               
               return (

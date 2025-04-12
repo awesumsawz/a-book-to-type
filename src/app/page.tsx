@@ -16,7 +16,7 @@ export default function Home() {
             <p>Upload PDF documents or text files to practice your typing skills with content that matters to you.</p>
             <Link 
               href="/upload" 
-              className="mt-auto py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              className="mt-auto py-2 px-4 bg-[#1a2b4b] text-white rounded-md hover:bg-[#2a3b5b] transition-colors"
             >
               Upload Document
             </Link>
@@ -27,7 +27,7 @@ export default function Home() {
             <p>Start a typing session with sample text or continue with your previously uploaded documents.</p>
             <Link 
               href="/practice" 
-              className="mt-auto py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              className="mt-auto py-2 px-4 bg-[#1a2b4b] text-white rounded-md hover:bg-[#2a3b5b] transition-colors"
             >
               Start Practice
             </Link>

@@ -101,7 +101,7 @@ export default function PracticePage() {
             <p>No text found. Please upload a document first.</p>
             <Link 
               href="/upload" 
-              className="mt-4 inline-block py-1.5 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm"
+              className="mt-4 inline-block py-1.5 px-4 bg-[#1a2b4b] text-white rounded-md hover:bg-[#2a3b5b] transition-colors text-sm"
             >
               Upload Document
             </Link>

@@ -78,9 +78,9 @@ export default function FileUploader({ setUploadStatus }: FileUploaderProps) {
       <div 
         {...getRootProps()} 
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-          ${isDragActive ? 'bg-gray-50 border-gray-400' : 'border-gray-300'}
-          ${isDragReject ? 'border-red-500 bg-red-50' : ''}
-          ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}
+          ${isDragActive ? 'bg-[#2a3b5b] border-[#3a4b6b] text-white' : 'border-[#2a3b5b]'}
+          ${isDragReject ? 'border-red-500 bg-red-900/50' : ''}
+          ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#2a3b5b] hover:border-[#3a4b6b]'}
         `}
       >
         <input {...getInputProps()} disabled={isProcessing} />
@@ -88,25 +88,25 @@ export default function FileUploader({ setUploadStatus }: FileUploaderProps) {
         <div className="flex flex-col items-center justify-center gap-3">
           {isDragReject ? (
             <>
-              <ExclamationCircleIcon className="h-10 w-10 text-red-500" />
-              <p className="text-red-500">File type not supported</p>
+              <ExclamationCircleIcon className="h-10 w-10 text-red-400" />
+              <p className="text-red-400">File type not supported</p>
             </>
           ) : isProcessing ? (
             <>
-              <div className="animate-spin h-10 w-10 border-2 border-gray-500 border-t-transparent rounded-full" />
-              <p className="text-gray-600">Processing your file...</p>
+              <div className="animate-spin h-10 w-10 border-2 border-[#3a4b6b] border-t-transparent rounded-full" />
+              <p className="text-gray-300">Processing your file...</p>
             </>
           ) : (
             <>
               {isDragActive ? (
-                <ArrowUpTrayIcon className="h-10 w-10 text-blue-500" />
+                <ArrowUpTrayIcon className="h-10 w-10 text-white" />
               ) : (
                 <DocumentTextIcon className="h-10 w-10 text-gray-400" />
               )}
               <p className="text-lg font-medium">
                 {isDragActive ? 'Drop your file here' : 'Drag & drop your file here'}
               </p>
-              <p className="text-sm text-gray-500">or click to browse files</p>
+              <p className="text-sm text-gray-300">or click to browse files</p>
               <p className="text-xs text-gray-400 mt-2">
                 Supported formats: PDF, TXT, RTF, DOCX
               </p>

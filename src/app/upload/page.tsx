@@ -25,18 +25,18 @@ export default function UploadPage() {
           </p>
         </div>
 
-        <div className="w-full bg-white rounded-lg shadow-sm p-8">
+        <div className="w-full bg-[#0f1b31] text-white rounded-lg shadow-lg p-8">
           <FileUploader setUploadStatus={setUploadStatus} />
         </div>
 
         {uploadStatus && (
-          <div className={`mt-8 p-4 rounded-lg ${uploadStatus.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+          <div className={`mt-8 p-4 rounded-lg shadow-md ${uploadStatus.success ? 'bg-green-900/90 text-green-100' : 'bg-red-900/90 text-red-100'}`}>
             <p className="text-center">{uploadStatus.message}</p>
             {uploadStatus.success && uploadStatus.textId && (
               <div className="mt-4 flex justify-center">
                 <Link 
                   href={`/practice?textId=${uploadStatus.textId}`}
-                  className="py-2 px-6 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                  className="mt-4 inline-block py-1.5 px-4 bg-[#1a2b4b] text-white rounded-md hover:bg-[#2a3b5b] transition-colors text-sm shadow-sm"
                 >
                   Start Typing
                 </Link>
@@ -45,20 +45,20 @@ export default function UploadPage() {
           </div>
         )}
 
-        <div className="mt-12 border rounded-lg p-6">
+        <div className="mt-12 border rounded-lg p-6 bg-[#1a2b4b] text-white shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Supported File Types</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-3 bg-gray-50 rounded">
+            <div className="p-3 bg-[#0f1b31] rounded shadow-md">
               <h3 className="font-medium">PDFs</h3>
-              <p className="text-sm text-gray-600">Both text-based and image-based (via OCR)</p>
+              <p className="text-sm text-gray-300">Both text-based and image-based (via OCR)</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded">
+            <div className="p-3 bg-[#0f1b31] rounded shadow-md">
               <h3 className="font-medium">Text Files</h3>
-              <p className="text-sm text-gray-600">.txt, .rtf, and other plain text formats</p>
+              <p className="text-sm text-gray-300">.txt, .rtf, and other plain text formats</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded">
+            <div className="p-3 bg-[#0f1b31] rounded shadow-md">
               <h3 className="font-medium">Documents</h3>
-              <p className="text-sm text-gray-600">.docx and other document formats</p>
+              <p className="text-sm text-gray-300">.docx and other document formats</p>
             </div>
           </div>
         </div>
