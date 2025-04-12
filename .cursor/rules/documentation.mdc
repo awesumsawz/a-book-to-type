@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Comprehensive Documentation Cursor Rule
+
+## Purpose
+
+Establish a unified documentation process that:
+- Automatically aggregates and updates documentation.
+- Organizes documentation files logically by feature.
+- Ensures continuity by referencing prior decisions during onboarding and next-step planning.
+
+## Directory and File Organization
+
+- **Root Documentation Directory:**  
+  All documentation is managed within the `documentation/` directory.
+  
+- **Feature Grouping:**  
+  - For distinct features, use dedicated files (e.g., `documentation/user-authentication.md`).
+  - For complex features, establish subdirectories (e.g., `documentation/payment-processing/`) with an `_index.md` file summarizing the feature’s documentation.
+  
+- **Master Index File:**  
+  Maintain a master index (`documentation/_index.md`) to list and link all feature-specific files and directories for easy navigation.
+
+## When to Update Documentation
+
+- **Onboarding:**  
+  At the beginning of every new session or when context is reintroduced, review the relevant documentation files to ensure alignment with previous decisions.
+  
+- **During Feature Development:**  
+  Update the corresponding feature file(s) with new insights, decisions, or modifications as tasks progress.
+  
+- **At Significant Milestones:**  
+  Immediately following important decisions or changes, append a new entry to the appropriate documentation file(s).
+
+## Documentation Entry Structure
+
+Each update should follow a consistent format:
+
+```markdown
+### [YYYY-MM-DD] Session Update: <Brief Title>
+
+**Summary:**
+- A concise description of the changes or decisions made.
+
+**Key Decisions:**
+- Bullet points summarizing critical choices and the rationale behind them.
+
+**Next Steps:**
+- Recommended follow-up actions or future considerations.
