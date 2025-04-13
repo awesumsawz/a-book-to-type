@@ -1,102 +1,201 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState, useCallback, useEffect } from 'react';
+import InputArea from '@/components/InputArea';
+import TypingArea, { TypingProgress } from '@/components/TypingArea';
+import MetricsDisplay from '@/components/MetricsDisplay';
+import { Toaster } from 'react-hot-toast';
+
+const LOCAL_STORAGE_KEY = 'typingAppState';
+
+interface TypingMetrics {
+    wpm: number;
+    accuracy: number;
+    errors: number;
+    finalTime?: number;
+}
+
+interface SavedState {
+    text: string;
+    progress: TypingProgress;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [textToType, setTextToType] = useState<string>('');
+  const [metrics, setMetrics] = useState<TypingMetrics | null>(null);
+  const [initialProgress, setInitialProgress] = useState<TypingProgress | null>(null);
+  const [resetTrigger, setResetTrigger] = useState<number>(0);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isComplete, setIsComplete] = useState<boolean>(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  useEffect(() => {
+    try {
+      const savedStateString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedStateString) {
+        const savedState: SavedState = JSON.parse(savedStateString);
+        if (savedState && savedState.text && savedState.progress && savedState.progress.currentIndex < savedState.text.length) {
+          console.log('Loading saved state:', savedState);
+          setTextToType(savedState.text);
+          setInitialProgress(savedState.progress);
+          handleProgressUpdate(savedState.progress, false);
+          setIsComplete(false);
+        } else if (savedState?.text) {
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load or parse saved state:', error);
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  const handleTextChange = useCallback((newText: string) => {
+    console.log('New text loaded, clearing saved state.');
+    setTextToType(newText);
+    setMetrics(null);
+    setInitialProgress(null);
+    setIsComplete(false);
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    setResetTrigger(prev => prev + 1);
+  }, []);
+
+  const handleProgressUpdate = useCallback((progress: TypingProgress, shouldSave: boolean = true) => {
+    let wpm = 0;
+    let accuracy = 100;
+
+    if (progress.timeElapsed > 0 && progress.totalTyped > 0) {
+      const wordsTyped = progress.totalTyped / 5;
+      const minutesElapsed = progress.timeElapsed / 60;
+      wpm = Math.round(wordsTyped / minutesElapsed);
+      accuracy = Math.round(((progress.totalTyped - progress.errors) / progress.totalTyped) * 100);
+      wpm = isNaN(wpm) || !isFinite(wpm) ? 0 : wpm;
+      accuracy = isNaN(accuracy) || !isFinite(accuracy) ? 0 : accuracy;
+    } else {
+       accuracy = progress.totalTyped > 0 ? Math.round(((progress.totalTyped - progress.errors) / progress.totalTyped) * 100) : 100;
+       accuracy = isNaN(accuracy) || !isFinite(accuracy) ? 100 : accuracy;
+    }
+
+    setMetrics(prevMetrics => ({
+      wpm: wpm,
+      accuracy: accuracy,
+      errors: progress.errors,
+      finalTime: prevMetrics?.finalTime 
+    }));
+
+    if (shouldSave && textToType && isLoaded && progress.currentIndex < textToType.length) {
+        try {
+            const stateToSave: SavedState = { text: textToType, progress };
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+        } catch (error) {
+            console.error('Failed to save state:', error);
+        }
+    }
+  }, [textToType, isLoaded]);
+
+  const handleResetComplete = useCallback(() => {
+    console.log("Typing area reset complete.");
+    setMetrics(null);
+  }, []);
+
+  const handleTestComplete = useCallback((finalProgress: TypingProgress) => {
+      console.log("Test Completed! Final Progress:", finalProgress);
+      setIsComplete(true);
+      setMetrics(prevMetrics => ({
+          ...(prevMetrics ?? { wpm: 0, accuracy: 0, errors: 0 }),
+          errors: finalProgress.errors,
+          finalTime: finalProgress.timeElapsed
+      }));
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+  }, []);
+
+  const handleManualReset = useCallback(() => {
+     console.log("Manual reset triggered.");
+     setMetrics(null);
+     setInitialProgress(null);
+     setIsComplete(false);
+     localStorage.removeItem(LOCAL_STORAGE_KEY);
+     setResetTrigger(prev => prev + 1);
+  }, []);
+
+  if (!isLoaded) {
+     return (
+       <div className="flex justify-center items-center min-h-screen bg-background text-foreground font-sans">
+         Loading...
+       </div>
+     );
+  }
+
+  return (
+    <div className="flex flex-col items-center min-h-screen p-4 sm:p-8 bg-background text-foreground font-sans">
+      <Toaster 
+        position="bottom-center"
+        toastOptions={{
+            className: '',
+            duration: 5000,
+            style: {
+                background: 'var(--dimmed)',
+                color: 'var(--foreground)',
+                border: '1px solid var(--muted)'
+            },
+            success: {
+                duration: 3000,
+            },
+            error: {
+                duration: 5000,
+            }
+        }}
+      />
+      <header className="w-full max-w-3xl mb-6 sm:mb-10 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">A Book To Type</h1>
+      </header>
+
+      <main className="w-full max-w-3xl flex flex-col gap-6 sm:gap-8">
+        <InputArea onTextChange={handleTextChange} />
+        {textToType && (
+            <TypingArea
+               textToType={textToType}
+               initialProgress={initialProgress}
+               onProgressUpdate={handleProgressUpdate}
+               onResetComplete={handleResetComplete}
+               onComplete={handleTestComplete}
+               triggerReset={resetTrigger}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        )}
+        {textToType && (
+            <MetricsDisplay
+               wpm={metrics?.wpm}
+               accuracy={metrics?.accuracy}
+               errors={metrics?.errors}
+               finalTime={metrics?.finalTime}
+               isComplete={isComplete}
+            />
+        )}
+        {textToType && !isComplete && (
+            <div className="flex justify-center mt-[-0.5rem] sm:mt-[-1rem] mb-4">
+                <button 
+                    onClick={handleManualReset}
+                    className="px-5 py-1.5 sm:px-6 sm:py-2 bg-primary text-background font-semibold rounded-full hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary transition-colors disabled:opacity-50 text-sm sm:text-base"
+                    disabled={!textToType}
+                >
+                    Reset Test
+                </button>
+            </div>
+        )}
+        {isComplete && (
+            <div className="flex justify-center mt-[-0.5rem] sm:mt-[-1rem] mb-4">
+                <button 
+                    onClick={() => handleTextChange('')}
+                    className="px-5 py-1.5 sm:px-6 sm:py-2 bg-muted text-foreground font-semibold rounded-full hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-muted transition-colors text-sm sm:text-base"
+                >
+                    Type New Text
+                </button>
+            </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="w-full max-w-3xl mt-10 sm:mt-16 text-center text-xs text-muted/70">
+        <p>Created with ❤️</p>
       </footer>
     </div>
   );
